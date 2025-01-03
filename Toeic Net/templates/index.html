@@ -251,30 +251,44 @@
             });
         }
 
-        function playAudio() {
-            const transcript = document.getElementById('transcript-text').textContent.trim();
+        let isAudioPlaying = false;  // Tracks whether the audio is playing
 
+       
+
+        function playAudio() {
+            const audioIcon = document.querySelector('.play-audio-btn i');  // Select icon element
+            const transcript = document.getElementById('transcript-text').textContent.trim();
+        
             if (!transcript) {
                 alert('No transcript available to play.');
                 return;
             }
-
-            if (isSpeaking) {
-                speechSynthesis.cancel();
-                isSpeaking = false;
-                return;
+        
+            if (!isAudioPlaying) {  // If audio is not playing, start playing
+                const speech = new SpeechSynthesisUtterance(transcript);
+                speech.lang = 'en-US';
+        
+                speech.addEventListener('end', () => {
+                    isAudioPlaying = false;  // Reset state when audio ends
+                    audioIcon.classList.remove('fa-volume-up');
+                    audioIcon.classList.add('fa-volume-mute');  // Change to mute icon when audio ends
+                });
+        
+                audioIcon.classList.remove('fa-volume-mute');  // Change to play icon during playback
+                audioIcon.classList.add('fa-volume-up');
+                speechSynthesis.speak(speech);  // Start playing audio
+                isAudioPlaying = true;
+        
+            } else {  // If audio is playing, stop it
+                speechSynthesis.cancel();  // Stop audio
+                audioIcon.classList.remove('fa-volume-up');
+                audioIcon.classList.add('fa-volume-mute');  // Change back to mute icon
+                isAudioPlaying = false;  // Update state
             }
-
-            const speech = new SpeechSynthesisUtterance(transcript);
-            speech.lang = 'en-US';
-            speech.addEventListener('end', () => {
-                isSpeaking = false;
-            });
-
-            speechSynthesis.speak(speech);
-            isSpeaking = true;
         }
-
+        
+          
+        
         function submitAnswer() {
             const selectedOption = document.querySelector('input[name="answer"]:checked');
             if (!selectedOption) {
