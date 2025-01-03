@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Test Preparation Service</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .transcript-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .radio-container {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .radio-option {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .submit-btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .button-grid button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease, transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .button-grid button span {
+            font-size: 0.9rem;
+        }
+
+        .button-grid button i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .button-grid button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .coming-soon {
+            background-color: #6c757d !important;
+            cursor: not-allowed;
+        }
+
+        .restart-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .play-audio-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .play-audio-btn:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Page 1: Choose TOEIC Part -->
+        <div id="page-1" class="page active">
+            <h1>TOEIC Test Preparation</h1>
+            <p>Select a TOEIC part to start practicing!</p>
+            <div class="button-grid">
+                <button onclick="selectPart('Part 3')"><i class="fas fa-comments"></i> <span>Part 3: Conversations</span></button>
+                <button onclick="selectPart('Part 4')"><i class="fas fa-microphone"></i> <span>Part 4: Talks</span></button>
+                <button class="coming-soon" disabled><i class="fas fa-image"></i> <span>Part 1: Photographs (Coming Soon)</span></button>
+                <button class="coming-soon" disabled><i class="fas fa-comment-dots"></i> <span>Part 2: Question-Response (Coming Soon)</span></button>
+                <button class="coming-soon" disabled><i class="fas fa-file-alt"></i> <span>Part 5: Incomplete Sentences (Coming Soon)</span></button>
+                <button class="coming-soon" disabled><i class="fas fa-file-alt"></i> <span>Part 6: Text Completion (Coming Soon)</span></button>
+                <button class="coming-soon" disabled><i class="fas fa-book"></i> <span>Part 7: Reading Comprehension (Coming Soon)</span></button>
+            </div>
+        </div>
+
+        <!-- Page 2: TOEIC Question -->
+        <div id="page-2" class="page">
+            <h1 id="part-title">TOEIC Practice Question</h1>
+            <p id="question-text">Listen to/read the following and select the correct answer:</p>
+            <div class="transcript-box">
+                <h3>Transcript:</h3>
+                <p id="transcript-text">The transcript will appear here.</p>
+                <button class="play-audio-btn" onclick="playAudio()"><i class="fas fa-volume-up"></i> Play/Stop Audio</button>
+            </div>
+            <form id="answer-form" class="radio-container">
+                <div class="radio-option">
+                    <input type="radio" id="optionA" name="answer" value="A">
+                    <label for="optionA" id="labelA">Option A</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="optionB" name="answer" value="B">
+                    <label for="optionB" id="labelB">Option B</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="optionC" name="answer" value="C">
+                    <label for="optionC" id="labelC">Option C</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="optionD" name="answer" value="D">
+                    <label for="optionD" id="labelD">Option D</label>
+                </div>
+                <button type="button" class="submit-btn" id="submit-btn" disabled onclick="submitAnswer()">Submit Answer</button>
+            </form>
+        </div>
+
+        <!-- Page 3: Feedback -->
+        <div id="page-3" class="page">
+            <h1>Answer Feedback</h1>
+            <p><strong>Your Answer:</strong> <span id="user-answer">A</span></p>
+            <p><strong>Correct Answer:</strong> <span id="correct-answer">B</span></p>
+            <div class="transcript-box">
+                <h3>Explanation:</h3>
+                <p id="answer-explanation">Your answer explanation will appear here.</p>
+            </div>
+            <button class="restart-btn" onclick="restart()"><i class="fas fa-arrow-left"></i> Back to Practice Selection</button>
+        </div>
+    </div>
+
+    <script>
+        let correctAnswer = '';
+        let isSpeaking = false;
+
+        function selectPart(part) {
+            fetch(`/generate-question?part=${part}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(`Error: ${data.error}`);
+                        return;
+                    }
+                    document.getElementById('part-title').textContent = part;
+                    document.getElementById('question-text').textContent = data.question || "Sample question text.";
+                    document.getElementById('transcript-text').textContent = data.transcript || "No transcript available.";
+                    correctAnswer = data.correct_answer;
+                    setRadioOptions(data.options);
+                    navigateTo('page-2');
+                })
+                .catch(error => {
+                    console.error('Error fetching question:', error);
+                    alert('An unexpected error occurred. Please check the console for details.');
+                });
+        }
+
+        function setRadioOptions(answerOptions) {
+            const labels = ['labelA', 'labelB', 'labelC', 'labelD'];
+            answerOptions.forEach((option, index) => {
+                document.getElementById(labels[index]).textContent = option;
+            });
+
+            document.querySelectorAll('input[name="answer"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    document.getElementById('submit-btn').disabled = false;
+                });
+            });
+        }
+
+        function playAudio() {
+            const transcript = document.getElementById('transcript-text').textContent.trim();
+
+            if (!transcript) {
+                alert('No transcript available to play.');
+                return;
+            }
+
+            if (isSpeaking) {
+                speechSynthesis.cancel();
+                isSpeaking = false;
+                return;
+            }
+
+            const speech = new SpeechSynthesisUtterance(transcript);
+            speech.lang = 'en-US';
+            speech.addEventListener('end', () => {
+                isSpeaking = false;
+            });
+
+            speechSynthesis.speak(speech);
+            isSpeaking = true;
+        }
+
+        function submitAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (!selectedOption) {
+                alert('Please select an answer before submitting.');
+                return;
+            }
+
+            const userAnswer = selectedOption.value;
+            fetch('/evaluate-answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_answer: userAnswer,
+                    correct_answer: correctAnswer
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('user-answer').textContent = userAnswer;
+                    document.getElementById('correct-answer').textContent = correctAnswer;
+                    document.getElementById('answer-explanation').textContent = data.explanation || "No explanation provided.";
+                    navigateTo('page-3');
+                })
+                .catch(error => {
+                    console.error('Error submitting answer:', error);
+                    alert('An error occurred while evaluating the answer.');
+                });
+        }
+
+        function restart() {
+            navigateTo('page-1');
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+    </script>
+</body>
+
+</html>
